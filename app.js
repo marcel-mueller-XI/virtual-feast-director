@@ -1,3 +1,4 @@
+const reconnect_delay = 2000; // 2 seconds
 const numeber_of_events_shown = 4; // number of events to show in the list including the current event
 
 // the functions expects a up to data eventList and the current event id
@@ -10,7 +11,7 @@ async function showEvents(current_event_id = null) {
         console.log("eventList received know.");
     }
 
-    if (!current_event_id) {    
+    if (!current_event_id) {
         if (previous_current_event_id) {
             current_event_id = previous_current_event_id;
             console.log("No current_event_id given. Using previous_current_event_id: ", previous_current_event_id);
@@ -68,7 +69,6 @@ async function getRundownList() {
 
 // const server_address = `${window.location.hostname}:${window.location.port}`;
 const server_address = "192.168.178.12:4001"
-const socket = new WebSocket("ws://" + server_address + "/ws");
 
 let backend_eventList;
 const html_eventList = document.getElementById("event-list");
@@ -77,7 +77,8 @@ let previous_current_event_id = null;
 
 async function main() {
     console.log("Welcome to the Virtual-Feast-Director");
-
+    connectWebSocket();
+    
     backend_eventList = await getRundownList();
     // console.log("main() Backend event list: ", backend_eventList);
 }
@@ -85,72 +86,80 @@ async function main() {
 main();
 
 
-// async socket functions below here
-socket.onopen = () => {
-    console.log("WebSocket connection established");
-};
-socket.onclose = () => {
-    console.log("WebSocket connection closed");
-};
+function connectWebSocket() {
+    const socket = new WebSocket("ws://" + server_address + "/ws");
+    socket.onopen = () => {
+        console.log("WebSocket connection established");
+    };
+    socket.onerror = (error) => {
+        console.error("WebSocket error:", error);
+    }
+    socket.onclose = (event) => {
+        console.warn('WebSocket closed:', event.code, event.reason, event.wasClean);
+        setTimeout(connectWebSocket, reconnect_delay);
+        console.log("Reconnecting to WebSocket...");
+    };
 
-socket.onmessage = async (message) => {
-    const data = JSON.parse(message.data);
-    const { type, payload } = data;
+    socket.onmessage = async (message) => {
+        const data = JSON.parse(message.data);
+        const { type, payload } = data;
 
-    switch (type) {
-        case 'ontime': {
+        switch (type) {
+            case 'ontime': {
                 console.log("ontime message payload: ", payload);
 
                 if (payload.onAir) {
-            console.log("eventNow.id: ", payload.eventNow.id);
-            showEvents(payload.eventNow.id);
+                    console.log("eventNow.id: ", payload.eventNow.id);
+                    showEvents(payload.eventNow.id);
                     document.body.style.opacity = "1";
                 } else {
                     document.body.style.opacity = "0";
                 }
 
-            break;
-        }
-        // case 'ontime-timer': {
-        //     console.log("ontime-timer message");
-        //     // const { current, playback } = payload;
-        //     // updateTimerElement(playback, current);
-        //     break;
-        // }
-        // case 'ontime-clock': {
-        //     console.log("ontime-clock message");
-        //     break;
-        // }
-        // case 'ontime-flush': {
-        //     console.log("ontime-flush message");
-        //     break;
-        // }
-        // case 'ontime-runtime': {
-        //     console.log("ontime-runtime message");
-        //     console.log("ontime-runtime message payload: ", payload);
-        //     break;
-        // }
-        case 'ontime-refetch': {    // this message is sent when a event got edited
-            console.log("ontime-refetch message");
-            console.log("ontime-refetch message payload: ", payload);
-            backend_eventList = await getRundownList();
-            showEvents();
-            break;
-        }
-        case 'ontime-eventNow': {   // returns the complete current event object
-            console.log("ontime-eventNow message");
+                break;
+            }
+            // case 'ontime-timer': {
+            //     console.log("ontime-timer message");
+            //     // const { current, playback } = payload;
+            //     // updateTimerElement(playback, current);
+            //     break;
+            // }
+            // case 'ontime-clock': {
+            //     console.log("ontime-clock message");
+            //     break;
+            // }
+            // case 'ontime-flush': {
+            //     console.log("ontime-flush message");
+            //     break;
+            // }
+            // case 'ontime-runtime': {
+            //     console.log("ontime-runtime message");
+            //     console.log("ontime-runtime message payload: ", payload);
+            //     break;
+            // }
+            case 'ontime-refetch': {    // this message is sent when a event got edited
+                console.log("ontime-refetch message");
+                console.log("ontime-refetch message payload: ", payload);
+                backend_eventList = await getRundownList();
+                showEvents();
+                break;
+            }
+            case 'ontime-eventNow': {   // returns the complete current event object
+                console.log("ontime-eventNow message");
 
                 if (payload) {
                     console.log("ontime-eventNow message payload: ", payload);
-            showEvents(payload.id);
+                    showEvents(payload.id);
                     document.body.style.opacity = "1";
                 } else {
                     document.body.style.opacity = "0";
                 }
-            break;
+                break;
+            }
+            // default: {
+            //     console.log("Unknown message type:", type);
+            // }
         }
-        // default: {
-        //     console.log("Unknown message type:", type);
-        // }
-    }
-};
+    };
+
+}
