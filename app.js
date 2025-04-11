@@ -67,8 +67,7 @@ async function getRundownList() {
     // console.log("Backend event list:", backend_eventList);
 }
 
-// const server_address = `${window.location.hostname}:${window.location.port}`;
-const server_address = "192.168.178.12:4001"
+const server_address = `${window.location.hostname}:${window.location.port}`;
 
 let backend_eventList;
 const html_eventList = document.getElementById("event-list");
