@@ -2,8 +2,9 @@ body {
   font-family: Arial, sans-serif;
   font-size: 1.8rem;
   background-color: rgba(0, 0, 0, 0);
-  ;
   padding: 2rem;
+
+  opacity: 0;
 }
 
 .container {

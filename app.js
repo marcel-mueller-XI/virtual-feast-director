@@ -1,3 +1,4 @@
+const numeber_of_events_shown = 4; // number of events to show in the list including the current event
 
 // the functions expects a up to data eventList and the current event id
 async function showEvents(current_event_id = null) {
@@ -41,7 +42,7 @@ async function showEvents(current_event_id = null) {
     });
 
     html_eventList.innerHTML = "";
-    for (let i = 0; i < shown_eventList.length && i < 4; i++) {
+    for (let i = 0; i < shown_eventList.length && i < numeber_of_events_shown; i++) {
         const event = shown_eventList[i];
         // console.log(`Event ${i + 1}:`, event);
 
@@ -98,10 +99,16 @@ socket.onmessage = async (message) => {
 
     switch (type) {
         case 'ontime': {
-            // console.log("ontime message payload: ", payload);
-            console.log("eventNow.id: ", payload.eventNow.id);
+                console.log("ontime message payload: ", payload);
 
+                if (payload.onAir) {
+            console.log("eventNow.id: ", payload.eventNow.id);
             showEvents(payload.eventNow.id);
+                    document.body.style.opacity = "1";
+                } else {
+                    document.body.style.opacity = "0";
+                }
+
             break;
         }
         // case 'ontime-timer': {
@@ -132,8 +139,14 @@ socket.onmessage = async (message) => {
         }
         case 'ontime-eventNow': {   // returns the complete current event object
             console.log("ontime-eventNow message");
-            // console.log("ontime-eventNow message payload: ", payload);
+
+                if (payload) {
+                    console.log("ontime-eventNow message payload: ", payload);
             showEvents(payload.id);
+                    document.body.style.opacity = "1";
+                } else {
+                    document.body.style.opacity = "0";
+                }
             break;
         }
         // default: {
