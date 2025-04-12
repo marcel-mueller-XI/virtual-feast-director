@@ -3,7 +3,7 @@ const numeber_of_events_shown = 4; // number of events to show in the list inclu
 
 // the functions expects a up to data eventList and the current event id
 async function showEvents(current_event_id = null) {
-    console.log("showEvents() called with current_event_id: ", current_event_id);
+    // console.log("showEvents() called with current_event_id: ", current_event_id);
     if (!backend_eventList) {
         console.log("No backend eventList available yet. requesting it now...");
 
@@ -37,7 +37,7 @@ async function showEvents(current_event_id = null) {
                 shown_eventList.push(previous_public_event);
             }
             // shown_eventList.push(previous_public_event);
-        } else if (after_current_event && event.isPublic) {
+        } else if (after_current_event && event.isPublic && !event.skip) {
             shown_eventList.push(event);
         }
     });
@@ -61,10 +61,9 @@ async function showEvents(current_event_id = null) {
 async function getRundownList() {
     const response = await fetch("http://" + server_address + "/data/rundown");
     const data = await response.json();
-    return data;
-
     // console.log("Type of backend_eventList: ", typeof backend_eventList);
     // console.log("Backend event list:", backend_eventList);
+    return data;
 }
 
 const server_address = `${window.location.hostname}:${window.location.port}`;
@@ -105,10 +104,10 @@ function connectWebSocket() {
 
         switch (type) {
             case 'ontime': {
-                console.log("ontime message payload: ", payload);
+                // console.log("ontime message payload: ", payload);
 
                 if (payload.onAir) {
-                    console.log("eventNow.id: ", payload.eventNow.id);
+                    // console.log("eventNow.id: ", payload.eventNow.id);
                     showEvents(payload.eventNow.id);
                     document.body.style.opacity = "1";
                 } else {
@@ -147,7 +146,7 @@ function connectWebSocket() {
                 console.log("ontime-eventNow message");
 
                 if (payload) {
-                    console.log("ontime-eventNow message payload: ", payload);
+                    // console.log("ontime-eventNow message payload: ", payload);
                     showEvents(payload.id);
                     document.body.style.opacity = "1";
                 } else {
