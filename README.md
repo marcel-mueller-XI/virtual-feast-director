@@ -1,7 +1,7 @@
 # Virtual-Feast-Director for ontime
 This is a custom view for [ontime](https://github.com/cpvalente/ontime).
 
-The Virtual Event Director is designed for live events to show the current public event and the next three public events (title only) on a projection screen or LED wall.
+The Virtual Event Director is designed for live events to show the **current public event** and the next three public events (title only) on a projection screen or LED wall.
 
 ---
 ![example screenshot](doc/example.png)
