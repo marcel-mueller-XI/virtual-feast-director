@@ -10,4 +10,4 @@ The Virtual Event Director is designed for live events to show the **current pub
 1. Move the `./virtual-feast-director` folder into the directory `ontime/data/external/`.
 2. Access the costum view under: `http://hostname:port/external/virtual-feast-director/`
 
-The ontime documention mentions costom views [here](https://docs.getontime.no/features/custom-views/).
+The ontime documention mentions custom views [here](https://docs.getontime.no/features/custom-views/).
