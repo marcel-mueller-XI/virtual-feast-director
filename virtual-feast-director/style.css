@@ -17,6 +17,8 @@ body {
   position: absolute;
   top: 2rem;
   left: 2rem;
+
+  opacity: 0;
 }
 
 #event-list {

@@ -46,9 +46,9 @@ async function showEvents(current_event_id = null) {
     });
 
     if (shown_eventList.length === 0) {
-        showBody(false);
+        document.getElementsByClassName("container")[0].style.opacity = "0";
     } else {
-        showBody(true);
+        document.getElementsByClassName("container")[0].style.opacity = "1";
 
         html_eventList.innerHTML = "";
         for (let i = 0; i < shown_eventList.length && i < numeber_of_events_shown; i++) {
